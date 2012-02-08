@@ -6,6 +6,7 @@
 // http://fhtr.blogspot.com/2010/02/4x4-float-matrix-multiplication-using.html
 #if defined(__cplusplus)
 #include <algebra.hpp>
+#warning C++ optimized SSE multiplication
 __inline void mmul(const float *a, const float *b, float *r)
 {
 	for(int i = 0; i < 16; i += 4) {
@@ -17,6 +18,7 @@ __inline void mmul(const float *a, const float *b, float *r)
 	}
 }
 #elif TYPE == 0
+#warning Pure C multiplication
 __inline void mmul(const float *a, const float *b, float *r)
 {
 	int i, j;
@@ -25,6 +27,7 @@ __inline void mmul(const float *a, const float *b, float *r)
 			r[i+j] = b[i]*a[j] + b[i+1]*a[j+4] + b[i+2]*a[j+8] + b[i+3]*a[j+12];
 }
 #elif TYPE == 1
+#warning Naive SSE multiplication
 __inline void mmul(const float *a, const float *b, float *r)
 {
 	__m128 a_line, b_line, r_line;
@@ -45,6 +48,7 @@ __inline void mmul(const float *a, const float *b, float *r)
 	}
 }
 #elif TYPE == 2
+#warning Optimized SSE multiplication
 __inline void mmul(const float * a, const float * b, float * r)
 {
 	__m128 a_line, b_line, r_line;
