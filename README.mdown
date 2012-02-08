@@ -1,0 +1,15 @@
+# SSE matrix 4x4 multiplication benchmark
+
+Based on article: [4x4 float matrix multiplication using SSE intrinsics](http://fhtr.blogspot.com/2010/02/4x4-float-matrix-multiplication-using.html)
+
+## Results 100M iterations
+
+Usage: `make O=(2,3) TYPE=(0,1,2) CC=(gcc-4.6.2,clang-3.0,cc) ITER=100000000`
+
+	         version     opt (-Ox)   plain  naive SSE    opt SSE
+	     GCC   4.6.2            2     3.11       4.17       1.66
+	     GCC   4.6.2            3     0.77       2.13       0.59
+	   clang     3.0            2     2.99       3.42       1.04
+	   clang     3.0            3     3.03       3.40       1.00
+	GCC/LLVM   2.4.1 (r5658)    2     2.60       5.03      crash
+	GCC/LLVM   2.4.1 (r5658)    3     2.59       5.04      crash
