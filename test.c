@@ -4,8 +4,8 @@
 #include <string.h>
 
 // http://fhtr.blogspot.com/2010/02/4x4-float-matrix-multiplication-using.html
-#if defined(__cplusplus)
-#include <algebra.hpp>
+#if __cplusplus
+#include "algebra.hpp"
 #warning C++ optimized SSE multiplication
 __inline void mmul(const float *a, const float *b, float *r)
 {
@@ -17,7 +17,7 @@ __inline void mmul(const float *a, const float *b, float *r)
 		rl >> &r[i];
 	}
 }
-#elif TYPE == 0
+#elif !TYPE
 #warning Pure C multiplication
 __inline void mmul(const float *a, const float *b, float *r)
 {
