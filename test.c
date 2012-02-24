@@ -7,7 +7,7 @@
 #if __cplusplus
 #include "algebra.hpp"
 #warning C++ optimized SSE multiplication
-__inline void mmul(const float *a, const float *b, float *r)
+__inline static void mmul(const float *a, const float *b, float *r)
 {
 	for(int i = 0; i < 16; i += 4) {
 		vec4 rl = vec4(a) * vec4(b[i]);
@@ -19,7 +19,7 @@ __inline void mmul(const float *a, const float *b, float *r)
 }
 #elif !TYPE
 #warning Pure C multiplication
-__inline void mmul(const float *a, const float *b, float *r)
+__inline static void mmul(const float *a, const float *b, float *r)
 {
 	int i, j;
 	for (i=0; i<16; i+=4)
@@ -28,7 +28,7 @@ __inline void mmul(const float *a, const float *b, float *r)
 }
 #elif TYPE == 1
 #warning Naive SSE multiplication
-__inline void mmul(const float *a, const float *b, float *r)
+__inline static void mmul(const float *a, const float *b, float *r)
 {
 	__m128 a_line, b_line, r_line;
 	float mc[16] __attribute__((aligned(16)));  // 16-byte aligned temp array
@@ -49,7 +49,7 @@ __inline void mmul(const float *a, const float *b, float *r)
 }
 #elif TYPE == 2
 #warning Optimized SSE multiplication
-__inline void mmul(const float * a, const float * b, float * r)
+__inline static void mmul(const float * a, const float * b, float * r)
 {
 	__m128 a_line, b_line, r_line;
 	int i, j;
