@@ -36,3 +36,67 @@ Results:
 [4] *GCC/LLVM 2.4.1* binaries provided by *Xcode 4.2* package.
 
 [5] *GCC 2.4.1* binaries provided by *Xcode 3.2.6* package.
+
+## Why Clang sucks in comparison to GCC
+
+*GCC* can perform whole loop of operations using XMM (SSE) registers only. *Clang* moves values back and forth between generic and XMM registers.
+
+*Clang* 3.1 loop:
+
+	LBB0_5:                                 ##   Parent Loop BB0_4 Depth=1
+	                                        ## =>  This Inner Loop Header: Depth=2
+		movss	-96(%rbp,%rcx,4), %xmm4
+		pshufd	$0, %xmm4, %xmm4        ## xmm4 = xmm4[0,0,0,0]
+		mulps	%xmm3, %xmm4
+		movss	-92(%rbp,%rcx,4), %xmm5
+		pshufd	$0, %xmm5, %xmm5        ## xmm5 = xmm5[0,0,0,0]
+		mulps	%xmm0, %xmm5
+		addps	%xmm4, %xmm5
+		movss	-88(%rbp,%rcx,4), %xmm4
+		pshufd	$0, %xmm4, %xmm4        ## xmm4 = xmm4[0,0,0,0]
+		mulps	%xmm1, %xmm4
+		addps	%xmm5, %xmm4
+		movss	-84(%rbp,%rcx,4), %xmm5
+		pshufd	$0, %xmm5, %xmm5        ## xmm5 = xmm5[0,0,0,0]
+		mulps	%xmm2, %xmm5
+		addps	%xmm4, %xmm5
+		movaps	%xmm5, -192(%rbp,%rcx,4)
+		leaq	4(%rcx), %rcx
+		cmpl	$16, %ecx
+		jl	LBB0_5
+
+*GCC* 4.6.2 loop:
+
+	L6:
+		movaps	%xmm2, %xmm9
+	L3:
+		movaps	%xmm1, %xmm8
+		movaps	%xmm9, %xmm4
+		movaps	%xmm0, %xmm2
+		mulps	%xmm3, %xmm8
+		movaps	%xmm6, %xmm5
+		addq	$1, %rdx
+		mulps	%xmm3, %xmm4
+		cmpq	%rax, %rdx
+		mulps	%xmm10, %xmm2
+		mulps	%xmm3, %xmm5
+		movaps	%xmm8, %xmm7
+		addps	%xmm4, %xmm7
+		addps	%xmm4, %xmm1
+		movaps	%xmm0, %xmm4
+		movaps	%xmm8, %xmm0
+		mulps	%xmm3, %xmm4
+		addps	%xmm9, %xmm0
+		addps	%xmm7, %xmm2
+		addps	%xmm4, %xmm1
+		addps	%xmm4, %xmm0
+		addps	%xmm7, %xmm4
+		addps	%xmm5, %xmm2
+		addps	%xmm5, %xmm1
+		addps	%xmm5, %xmm0
+		addps	%xmm4, %xmm6
+		jl	L6
+		movaps	%xmm2, (%rsp)
+		movaps	%xmm1, 16(%rsp)
+		movaps	%xmm0, 32(%rsp)
+		movaps	%xmm6, 48(%rsp)
