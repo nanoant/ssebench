@@ -8,7 +8,7 @@ ITER     := 100000001
 SRC      := test.c
 SUFFIX   := -o$(O)-t$(TYPE)-$(CC)
 OBJ      := $(SRC:.c=$(SUFFIX).o)
-CPPFLAGS := $(CPPFLAGS) -DTYPE=$(TYPE) -Wall -O$(O)
+CPPFLAGS := $(CPPFLAGS) -DTYPE=$(TYPE) -Wall -O$(O) -march=native
 LDFLAGS  := $(LDFLAGS) -Wall -O$(O)
 
 run: test$(SUFFIX)
