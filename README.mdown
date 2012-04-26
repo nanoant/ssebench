@@ -15,28 +15,22 @@ Tested on:
 
 Results:
 
-	           version  opt (-Ox)   plain  naive SSE    opt SSE
-	     GCC [1] 4.7           2     3.24       4.40       1.90
-	     GCC     4.7           3     0.75       2.13       0.54
-	     GCC [1] 4.6.2         2     3.11       4.17       1.66
-	     GCC     4.6.2         3     0.77       2.13       0.59
-	   clang [2] 3.1/318.0.45  2     2.99       3.42       1.04
-	   clang     3.1/318.0.45  3     3.03       3.42       1.04
-	   clang [3]   3.0         2     2.99       3.42       1.04
-	   clang       3.0         3     3.03       3.40       1.00
-	GCC/LLVM [4] 2.4.1/2336.1  2     2.60       5.03      crash
-	GCC/LLVM     2.4.1/2336.1  3     2.59       5.04      crash
-	     GCC [5] 2.4.1         2     2.98       4.62       1.93
-	     GCC     2.4.1         3     2.70       4.41       1.63
+	             version  opt/-Ox   arch        plain  naive SSE    opt SSE
+	     ICC [1] 12.1.3         3   corei7-avx   0.96       2.87       1.00
+	     ICC     12.1.3         3   core2        1.04       3.20       1.05
+	     GCC [2] 4.7            3   corei7-avx   0.73       2.08       0.54
+	     GCC     4.7            3   core2        0.78       2.32       0.58
+	     GCC     4.6.2          3   corei7-avx   0.88       1.97       0.54
+	     GCC     4.6.2          3   core2        0.74       2.08       0.58
+	   clang [3] 3.1/318.0.58   3   corei7-avx   3.03       3.19       1.03
+	   clang     3.1/318.0.58   3   core2        3.03       3.39       1.03
+	GCC/LLVM [4] 2.4.1/2336.1   3   core2        2.56       4.93     **CRASH**
+	     GCC [5] 2.4.1          3   core2        2.70       4.41       1.63
 
-[1] *GCC 4.6.2* was built from [GNU sources](http://gcc.gnu.org/).
-
-[2] *clang 3.1* binaries provided by *Xcode 4.3* package.
-
-[3] *clang 3.0* was built from sources provided by [LLVM project](http://llvm.org/).
-
+[1] *ICC 12.1.3* binaries provided by [Intel® C++ Composer XE 2011 for Mac OS X](http://software.intel.com/en-us/articles/intel-composer-xe/).
+[2] *GCC 4.7* & *GCC 4.6.2* was built from [GNU sources](http://gcc.gnu.org/).
+[3] *clang 3.1* binaries provided by *Xcode 4.3* package.
 [4] *GCC/LLVM 2.4.1* binaries provided by *Xcode 4.2* package.
-
 [5] *GCC 2.4.1* binaries provided by *Xcode 3.2.6* package.
 
 ## Why Clang sucks in comparison to GCC
