@@ -33,11 +33,19 @@ Results:
 [4] *GCC/LLVM 2.4.1* binaries provided by *Xcode 4.2* package.
 [5] *GCC 2.4.1* binaries provided by *Xcode 3.2.6* package.
 
-## Why Clang sucks in comparison to GCC
+## GCC seems to provide best performance
 
-*GCC* can perform whole loop of operations using XMM (SSE) registers only. *Clang* moves values back and forth between generic and XMM registers.
+Both *GCC 4.7* and *4.6.2* provide best performance, also pure C implementation is just 50% slower under *GCC* than optimized SSE matrix multiplication, where it is 100% slower under *ICC* and 300% slower under *Clang*.
 
-*Clang* 3.1 loop:
+## Why ICC sucks in comparison to GCC for SSE optimized example
+
+*GCC* can perform whole loop of operations using XMM (SSE) registers only if all calculation can be done in place. *ICC* moves values back and forth between stack and XMM registers using SSE4/AVX instructions.
+
+## Why Clang sucks in comparison to GCC & ICC
+
+*Clang* does not even use SSE4/AVX instructions, but older `movss` than moves single SSE register value. So it is even slower than ICC. *Clang* also poorly optimize pure C version, where **GCC** and **ICC** can optimize using AVX.
+
+*Clang* 3.1 optimized SSE exampel loop:
 
 	LBB0_5:                                 ##   Parent Loop BB0_4 Depth=1
 	                                        ## =>  This Inner Loop Header: Depth=2
