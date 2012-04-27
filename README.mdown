@@ -112,6 +112,8 @@ Both *GCC 4.7* and *4.6.2* provide best performance, also pure C implementation 
 
 ## SciMark 2 results
 
+*ICC* outperforms *GCC* with 4%, *GCC* outperforms *Clang* with 18%.
+
 `./scimark2_c-o3-t2-icc-corei7-avx`
 
 	Using       2.00 seconds min time per kenel.
