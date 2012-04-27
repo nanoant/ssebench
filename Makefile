@@ -1,3 +1,5 @@
+# matrix (SSE matrix multiplication), scimark2_c (C scimark)
+TEST     := matrix
 # 0-plain C, 1-naive SSE, 2-optimized SSE
 TYPE     := 2
 # compiler optimization level
@@ -5,21 +7,21 @@ O        := 2
 # iterations count, with ITER%4==0 A should be identity, with ITER%4==1 A==B (rotion matrix)
 ITER     := 100000001
 
-SRC      := test.c
+SRC      := $(TEST).c
 ARCH     := native
 SUFFIX   := -o$(O)-t$(TYPE)-$(CC)-$(ARCH)
 OBJ      := $(SRC:.c=$(SUFFIX).o)
 CPPFLAGS := $(CPPFLAGS) -DTYPE=$(TYPE) -Wall -O$(O) -march=$(ARCH)
 LDFLAGS  := $(LDFLAGS) -Wall -O$(O)
 
-run: test$(SUFFIX)
-	./test$(SUFFIX) $(ITER)
+run: $(TEST)$(SUFFIX)
+	./$(TEST)$(SUFFIX) $(ITER)
 
 %$(SUFFIX).o: %.c
 	$(CC) $(CPPFLAGS) -c -S -o $(@:.o=.s) $<
 	$(CC) $(CPPFLAGS) -c -o $@ $<
 
-test_$(TYPE)-$(CC): $(OBJ)
+$(TEST)_$(TYPE)-$(CC): $(OBJ)
 	$(CC) $(LDFLAGS) -o $@ $^
 
 clean:

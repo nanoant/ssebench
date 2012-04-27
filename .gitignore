@@ -1,2 +1,4 @@
 *.o
 test-*
+matrix-*
+scimark2_c-*

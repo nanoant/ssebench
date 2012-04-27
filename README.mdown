@@ -1,12 +1,15 @@
-# SSE matrix 4x4 multiplication benchmark
+# SSE matrix 4x4 multiplication & SciMark 2 benchmark
 
-Based on article: [4x4 float matrix multiplication using SSE intrinsics](http://fhtr.blogspot.com/2010/02/4x4-float-matrix-multiplication-using.html)
+Based on:
+
+* [4x4 float matrix multiplication using SSE intrinsics](http://fhtr.blogspot.com/2010/02/4x4-float-matrix-multiplication-using.html)
+* [SciMark 2 C implementation](http://leonardo-m.livejournal.com/82803.html)
 
 ### Usage
 
-`make O=(2,3) TYPE=(0,1,2) CC=(gcc-4.6.2,clang-3.0,cc) ITER=100000000`
+`make TEST=(matrix,scimark2_c) O=(2,3) TYPE=(0,1,2) CC=(gcc-4.6.2,clang-3.0,cc) ITER=100000000`
 
-### Results 100M iterations
+### SSE matrix results 100M iterations
 
 Tested on:
 
@@ -15,17 +18,17 @@ Tested on:
 
 Results:
 
-	             version  opt/-Ox   arch        plain  naive SSE    opt SSE
-	     ICC [1] 12.1.3         3   corei7-avx   0.96       2.87       1.00
-	     ICC     12.1.3         3   core2        1.04       3.20       1.05
-	     GCC [2] 4.7            3   corei7-avx   0.73       2.08       0.54
-	     GCC     4.7            3   core2        0.78       2.32       0.58
-	     GCC     4.6.2          3   corei7-avx   0.88       1.97       0.54
-	     GCC     4.6.2          3   core2        0.74       2.08       0.58
-	   clang [3] 3.1/318.0.58   3   corei7-avx   3.03       3.19       1.03
-	   clang     3.1/318.0.58   3   core2        3.03       3.39       1.03
-	GCC/LLVM [4] 4.2.1/2336.1   3   core2        2.56       4.93     **CRASH**
-	     GCC [5] 4.2.1          3   core2        2.70       4.41       1.63
+	             version  opt/-Ox   arch        SciMark comp. Matrix plain  naive SSE    opt SSE
+	     ICC [1] 12.1.3         3   corei7-avx        1734.40         0.96       2.87       1.00
+	     ICC     12.1.3         3   core2             1741.45         1.04       3.20       1.05
+	     GCC [2] 4.7            3   corei7-avx        1666.37         0.73       2.08       0.54
+	     GCC     4.7            3   core2             1355.56         0.78       2.32       0.58
+	     GCC     4.6.2          3   corei7-avx        1641.45         0.88       1.97       0.54
+	     GCC     4.6.2          3   core2             1357.67         0.74       2.08       0.58
+	   clang [3] 3.1/318.0.58   3   corei7-avx        1406.52         3.03       3.19       1.03
+	   clang     3.1/318.0.58   3   core2             1406.03         3.03       3.39       1.03
+	GCC/LLVM [4] 4.2.1/2336.1   3   core2                             2.56       4.93     **CRASH**
+	     GCC [5] 4.2.1          3   core2                             2.70       4.41       1.63
 
 [1] *ICC 12.1.3* binaries provided by [Intel® C++ Composer XE 2011 for Mac OS X](http://software.intel.com/en-us/articles/intel-composer-xe/).
 [2] *GCC 4.7* & *GCC 4.6.2* was built from [GNU sources](http://gcc.gnu.org/).
@@ -33,15 +36,17 @@ Results:
 [4] *GCC/LLVM 4.2.1* binaries provided by *Xcode 4.2* package.
 [5] *GCC 4.2.1* binaries provided by *Xcode 3.2.6* package.
 
-## GCC seems to provide best performance
+## SSE matrix conclusions
+
+#### GCC seems to provide best performance
 
 Both *GCC 4.7* and *4.6.2* provide best performance, also pure C implementation is just 50% slower under *GCC* than optimized SSE matrix multiplication, where it is 100% slower under *ICC* and 300% slower under *Clang*.
 
-## Why ICC sucks in comparison to GCC for SSE optimized example
+#### Why ICC sucks in comparison to GCC for SSE optimized example
 
 *GCC* can perform whole loop of operations using XMM (SSE) registers only if all calculation can be done in place. *ICC* moves values back and forth between stack and XMM registers using SSE4/AVX instructions.
 
-## Why Clang sucks in comparison to GCC & ICC
+#### Why Clang sucks in comparison to GCC & ICC
 
 *Clang* does not even use SSE4/AVX instructions, but older `movss` than moves single SSE register value. So it is even slower than ICC. *Clang* also poorly optimize pure C version, where **GCC** and **ICC** can optimize using AVX.
 
@@ -104,3 +109,85 @@ Both *GCC 4.7* and *4.6.2* provide best performance, also pure C implementation 
 		movaps	%xmm1, 16(%rsp)
 		movaps	%xmm0, 32(%rsp)
 		movaps	%xmm6, 48(%rsp)
+
+## SciMark 2 results
+
+`./scimark2_c-o3-t2-icc-corei7-avx`
+
+	Using       2.00 seconds min time per kenel.
+	Composite Score:         1725.89
+	FFT             Mflops:  1263.81    (N=1024)
+	SOR             Mflops:  1193.42    (100 x 100)
+	MonteCarlo:     Mflops:   970.75
+	Sparse matmult  Mflops:  1461.61    (N=1000, nz=5000)
+	LU              Mflops:  3739.88    (M=100, N=100)
+
+`./scimark2_c-o3-t2-icc-core2`
+
+	Using       2.00 seconds min time per kenel.
+	Composite Score:         1741.45
+	FFT             Mflops:  1213.43    (N=1024)
+	SOR             Mflops:  1195.41    (100 x 100)
+	MonteCarlo:     Mflops:   958.60
+	Sparse matmult  Mflops:  1515.78    (N=1000, nz=5000)
+	LU              Mflops:  3824.03    (M=100, N=100)
+
+`./scimark2_c-o3-t2-gcc-4.7-corei7-avx`
+
+	Using       2.00 seconds min time per kenel.
+	Composite Score:         1666.37
+	FFT             Mflops:  1446.79    (N=1024)
+	SOR             Mflops:  1018.09    (100 x 100)
+	MonteCarlo:     Mflops:   604.54
+	Sparse matmult  Mflops:  1774.87    (N=1000, nz=5000)
+	LU              Mflops:  3487.58    (M=100, N=100)
+
+`./scimark2_c-o3-t2-gcc-4.7-core2`
+
+	Using       2.00 seconds min time per kenel.
+	Composite Score:         1355.56
+	FFT             Mflops:  1395.37    (N=1024)
+	SOR             Mflops:  1022.19    (100 x 100)
+	MonteCarlo:     Mflops:   591.04
+	Sparse matmult  Mflops:  1768.99    (N=1000, nz=5000)
+	LU              Mflops:  2000.24    (M=100, N=100)
+
+`./scimark2_c-o3-t2-gcc-4.6.2-corei7-avx`
+
+	Using       2.00 seconds min time per kenel.
+	Composite Score:         1641.45
+	FFT             Mflops:  1437.98    (N=1024)
+	SOR             Mflops:  1010.89    (100 x 100)
+	MonteCarlo:     Mflops:   803.15
+	Sparse matmult  Mflops:  1601.78    (N=1000, nz=5000)
+	LU              Mflops:  3353.45    (M=100, N=100)
+
+`./scimark2_c-o3-t2-gcc-4.6.2-core2`
+
+	Using       2.00 seconds min time per kenel.
+	Composite Score:         1357.67
+	FFT             Mflops:  1385.32    (N=1024)
+	SOR             Mflops:  1025.30    (100 x 100)
+	MonteCarlo:     Mflops:   802.10
+	Sparse matmult  Mflops:  1600.90    (N=1000, nz=5000)
+	LU              Mflops:  1974.74    (M=100, N=100)
+
+`./scimark2_c-o3-t2-clang-core2`
+
+	Using       2.00 seconds min time per kenel.
+	Composite Score:         1406.03
+	FFT             Mflops:  1050.31    (N=1024)
+	SOR             Mflops:  1417.75    (100 x 100)
+	MonteCarlo:     Mflops:   562.68
+	Sparse matmult  Mflops:  1644.04    (N=1000, nz=5000)
+	LU              Mflops:  2355.38    (M=100, N=100)
+
+`./scimark2_c-o3-t2-clang-corei7-avx`
+
+	Using       2.00 seconds min time per kenel.
+	Composite Score:         1406.52
+	FFT             Mflops:  1051.59    (N=1024)
+	SOR             Mflops:  1421.25    (100 x 100)
+	MonteCarlo:     Mflops:   559.95
+	Sparse matmult  Mflops:  1638.98    (N=1000, nz=5000)
+	LU              Mflops:  2360.82    (M=100, N=100)
