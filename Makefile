@@ -8,20 +8,24 @@ O        := 2
 ITER     := 100000001
 
 SRC      := $(TEST).c
+OBJDIR   := build.$(shell uname -s)
 ARCH     := native
 SUFFIX   := -o$(O)-t$(TYPE)-$(CC)-$(ARCH)
-OBJ      := $(SRC:.c=$(SUFFIX).o)
-CPPFLAGS := $(CPPFLAGS) -DTYPE=$(TYPE) -Wall -O$(O) -march=$(ARCH)
-LDFLAGS  := $(LDFLAGS) -Wall -O$(O)
+BIN      := $(OBJDIR)/$(TEST)$(SUFFIX)
+OBJ      := $(addprefix $(OBJDIR)/,$(SRC:.c=$(SUFFIX).o))
+CPPFLAGS := $(CPPFLAGS) -g -fopenmp -DTYPE=$(TYPE) -Wall -O$(O) -march=$(ARCH)
+LDFLAGS  := $(LDFLAGS) -fopenmp -Wall -O$(O)
 
-run: $(TEST)$(SUFFIX)
-	./$(TEST)$(SUFFIX) $(ITER)
+run: $(BIN)
+	./$(BIN) $(ITER)
 
-%$(SUFFIX).o: %.c
+$(OBJDIR):; mkdir $(OBJDIR)
+
+$(OBJDIR)/%$(SUFFIX).o: %.c $(OBJDIR)
 	$(CC) $(CPPFLAGS) -c -S -o $(@:.o=.s) $<
 	$(CC) $(CPPFLAGS) -c -o $@ $<
 
-$(TEST)_$(TYPE)-$(CC): $(OBJ)
+$(BIN): $(OBJ)
 	$(CC) $(LDFLAGS) -o $@ $^
 
 clean:
